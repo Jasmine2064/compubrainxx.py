@@ -1,0 +1,153 @@
+@@ -0,0 +1,152 @@
+import datetime
+import os.path
+import sys
+import requests 
+import speech_recognition as sr
+import pyttsx3
+import pywhatkit
+import datetime
+import pyjokes
+import wikipedia
+import subprocess
+import os
+import pyscreenshot
+import pytz
+import webbrowser
+import pyautogui
+import gui
+
+
+
+
+listener = sr.Recognizer()
+engine = pyttsx3.init()
+voices = engine.getProperty('voices')
+engine.setProperty('voice', voices[1].id)
+
+def speak(audio):
+    engine.say(audio)
+    engine.runAndWait()
+
+
+
+def takeCommand():
+    r = sr.Recognizer()
+    with sr.Microphone() as source:
+        print("Listening...")
+        r.pause_threshold = 1
+        audio = r.listen(source)
+    
+    try:
+        print("Recognizing...")    
+        query = r.recognize_google(audio, language='en-in')
+        print(f"User said: {query}\n")
+
+    except Exception as e:
+        # print(e)    
+        print("Say that again please...")  
+        return "None"
+    return query
+
+
+def first_run():
+    welcome_msg = "HI everyone this is compubrain developed by Jasmine. Current time is {}. How may i help you".format(
+        datetime.datetime.now().strftime('%I:%M %p'))
+    engine.runAndWait()
+    return dict({'name': 'Compubrain', 'msg': welcome_msg})
+
+
+def talk(text):
+    engine.say(text)
+    engine.runAndWait()
+
+
+def first_1():
+    command = ""
+    try:
+        with sr.Microphone() as source:
+            print('listening...')
+            voice = listener.listen(source)
+            command = listener.recognize_google(
+                voice, key=None, language='en-in', show_all=True)
+            print(command)
+            if command != []:
+                command = command['alternative'][0]['transcript']
+                command = command.lower()
+            else:
+                command = ""
+    except:
+        pass
+    return dict({"name": "You", "msg": command})
+
+
+def run_alexa(command):
+    if command == "No command recieved":
+        reply = "No command recieved"
+    elif 'hello' in command or 'hi' in command:
+        reply = "Hello, Good wishes to you"
+    elif 'how are you' in command:
+        reply = "I am fine, Thank you"
+        reply += ",How are you Jasmine?"
+    elif 'search' in command:
+        inp = command.replace('search', '')
+        reply = 'searching ' + inp
+        pywhatkit.search(inp)
+    elif 'time' in command:
+        time = datetime.datetime.now().strftime('%I:%M %p')
+        reply = 'Current time is ' + time
+        a= input("Enter'set reminder' if reminder needs to be set,otherwise input 'quit:")
+        if a== 'set reminder':
+            with open("remider.txt",'w') as f:
+                reminder = input("Enter reminder: ")
+                f.write(f"{time}  {reminder}")
+    elif 'according wikipedia' in query:
+            speak('Searching Wikipedia...')
+            query = query.replace("wikipedia", "")
+            results = wikipedia.summary(query, sentences=2)
+            speak("According to Wikipedia")
+            print(results)
+            speak(results)
+    elif 'joke' in command:
+        reply = pyjokes.get_joke()
+    elif 'play' in command:
+        song = command.replace('play', '')
+        reply = 'playing ' + song
+        pywhatkit.playonyt(song)
+
+
+       
+
+    elif 'open google' in command or 'open chatgpt' in command or 'open youtube' in command or 'open github' in command or 'open facebook' in command:
+        inp = command.replace('open', '')
+        inp = inp.replace(' ', '')
+        talk("Opening "+inp+" there")
+        b = webbrowser.get()
+
+        if(inp == "google"):
+            b.open("https://google.com")
+        elif (inp == "chatgpt"):
+            b.open("https://chat.openai.com")
+        elif (inp == "youtube"):
+            b.open("https://www.youtube.com")
+        elif (inp == "github"):
+            b.open("https://github.com")
+        elif (inp == "facebook"):
+            b.open("https://facebook.com")
+        reply = "Opened "+inp+" in your web browser"
+
+
+
+    elif "what's your name" in command or "what is your name" in command:
+        reply = "My name is Compubrain a machine learning model!!"
+
+    elif 'exit' in command:
+        talk("Thanks for giving me your time see you soon")
+        exit()
+
+    elif "who made you" in command or "who created you" in command or "who is your god" in command:
+        reply = "I have been created by Jasmine Shrestha and you are my virtual friend."
+
+    elif 'rest' in command or 'sleep' in command:
+        reply = 'Okay Guys I will just take a nap, Call me whenever u need my help'
+        exit()
